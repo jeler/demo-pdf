@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 )
@@ -17,4 +19,19 @@ func CalcRowHeight(m pdf.Maroto, text string, textProp props.Text, gridWidth, co
 	}
 	fontHeight := textProp.Size/pdfM.Font.GetScaleFactor() + textProp.VerticalPadding
 	return lines*fontHeight + textProp.Top
+}
+
+
+func AreaLeft(m pdf.Maroto, area string) {
+	height := m.GetCurrentOffset()
+	heightStr := fmt.Sprintf("space after building %s %f", area, height)
+	fmt.Println(heightStr)
+}
+
+func CalcPageSpaceRemaining(m pdf.Maroto) float64 {
+	_, totalPageSize := m.GetPageSize()
+	currentSpace := m.GetCurrentOffset()
+	remaining := totalPageSize - currentSpace;
+	fmt.Println(remaining)
+	return remaining
 }

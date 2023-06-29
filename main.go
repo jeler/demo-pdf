@@ -7,20 +7,11 @@ import (
 	"os"
 	"strconv"
 
-
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 )
-
-// overall page margin
-const topPageMargin = 10
-const bottomPageMargin = 15
-const sidePageMargin = 10
-const logoRowHeight = 20
-const headerRow = 40
-
 type RowOptions struct {
 	RowHeight float64
 	Field     string
@@ -30,16 +21,37 @@ type RowOptions struct {
 func main() {
 	m := pdf.NewMaroto(consts.Portrait, consts.Letter)
 
+	// _, heightMain := m.GetPageSize()
+	// fmt.Println(heightMain)
+
 	// total number of pages
 	m.SetAliasNbPages("{nbs}")
 	m.SetFirstPageNb(1)
 
 	// readWrite()
 
+
 	buildHeading(m)
 
-	buildFooter(m)
+	// spaceAfterHeader := m.GetCurrentOffset()
+	// spaceAfterHeaderStr := fmt.Sprintf("space after building header %f", spaceAfterHeader)
+	// fmt.Println(spaceAfterHeaderStr)
+
 	buildNurseListRowsCols(m)
+	// spaceAfterBuilding := m.GetCurrentOffset()
+	// spaceAfterBuildingStr := fmt.Sprintf("space after building content %f", spaceAfterBuilding)
+	// fmt.Println(spaceAfterBuildingStr)
+	// requestedUserRow := fmt.Sprintf("%s %s", requestedUser.FirstName, requestedUser.LastName)
+
+
+	buildFooter(m)
+
+	// spaceAfterFooter := m.GetCurrentOffset()
+	// spaceAfterFooterStr := fmt.Sprintf("space after footer %f", spaceAfterFooter)
+	// fmt.Println(spaceAfterFooterStr)
+
+	// buildNurseListRowsCols(m)
+
 
 
 	err := m.OutputFileAndClose("pdfs/moroto-demo.pdf")
@@ -47,7 +59,7 @@ func main() {
 		fmt.Println("⚠️  Could not save PDF:", err)
 		os.Exit(1)
 	}
-	fmt.Println("PDF saved successfully")
+	// fmt.Println("PDF saved successfully")
 }
 
 // fn for trying to get an image from url
@@ -65,7 +77,7 @@ func main() {
 func buildHeading(m pdf.Maroto) {
 
 	m.RegisterHeader(func() {
-		m.Row(logoRowHeight, func() {
+		m.Row(20, func() {
 			m.Col(6, func() {
 				err := m.FileImage("images/go-logo.jpg", props.Rect{
 					Top:     0,
@@ -90,15 +102,13 @@ func buildHeading(m pdf.Maroto) {
 }
 
 func buildContentContainer(m pdf.Maroto) {
-	_, height := m.GetPageSize()
-	fmt.Println(height)
 	buildNurseListRowsCols(m)
 
 }
 
+
 func buildNurseListRowsCols(m pdf.Maroto) {
 	requestedUser := data.GenerateNurse()
-	fmt.Println(requestedUser)
 	requestedUserRow := fmt.Sprintf("%s %s", requestedUser.FirstName, requestedUser.LastName)
 	m.Row(20, func() {
 		m.Col(12, func() {
@@ -107,6 +117,7 @@ func buildNurseListRowsCols(m pdf.Maroto) {
 			})
 		})
 	})
+
 	m.Row(20, func() {
 		m.Col(12, func() {
 			m.Text(requestedUserRow, props.Text{
@@ -124,21 +135,29 @@ func buildNurseListRowsCols(m pdf.Maroto) {
 
 	generateRow(m, IdRow)
 
+	// utils.AreaLeft(m, "after id row")
+
 	roleRow := &RowOptions{10, "Role", requestedUser.JobTitle}
 
 	generateRow(m, roleRow)
+
+	// utils.AreaLeft(m, "after role row")
 
 	// Email
 	emailRow := &RowOptions{10, "Email", requestedUser.Email}
 
 	generateRow(m, emailRow)
 
-	var formattedAddress = fmt.Sprintf("%s %s, %s %s", requestedUser.Address, requestedUser.City, requestedUser.State, requestedUser.Zip)
+	// utils.AreaLeft(m, "after email row")
+	utils.CalcPageSpaceRemaining(m)
 
 
-	addressTextProps := props.Text{Top: 3, Left: 3}
-	addressRowHeight := utils.CalcRowHeight(m, formattedAddress, addressTextProps, 6, 6)
-	fmt.Println(addressRowHeight)
+	// var formattedAddress = fmt.Sprintf("%s %s, %s %s", requestedUser.Address, requestedUser.City, requestedUser.State, requestedUser.Zip)
+
+
+	// addressTextProps := props.Text{Top: 3, Left: 3}
+	// addressRowHeight := utils.CalcRowHeight(m, formattedAddress, addressTextProps, 6, 6)
+	// fmt.Println(addressRowHeight)
 	m.Line(2, props.Line{
 		Width: 0,
 	})
